@@ -4,6 +4,7 @@ import com.example.demo.entity.Department;
 import com.example.demo.exception.BadRequestException;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.DepartmentRepository;
+import org.springframework.dao.DuplicateKeyException;
 import com.example.demo.repository.EmployeeRepository;
 import org.springframework.stereotype.Service;
 
@@ -22,11 +23,13 @@ public class DepartmentService {
     }
 
     public Department createDepartment(Department department) {
-        if (departmentRepository.existsByName(department.getName())) {
-            throw new BadRequestException("Department with name '" 
-                    + department.getName() + "' already exists");
+        try{
+            return departmentRepository.save(department);
+        } catch (DuplicateKeyException ex) {
+            throw new BadRequestException(
+            "Department with name ' " + department.getName() + " ' already exists"
+        );
         }
-        return departmentRepository.save(department);
     }
 
     public List<Department> getAllDepartments() {
